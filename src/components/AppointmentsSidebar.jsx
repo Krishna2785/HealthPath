@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Calendar, Clock, Stethoscope, Building2, CheckCircle2, AlertCircle, ChevronRight, ClipboardList, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api';
 
 const statusConfig = {
   Confirmed: {
@@ -34,7 +35,7 @@ export default function AppointmentsSidebar({ isOpen, onClose }) {
   useEffect(() => {
     if (isOpen) {
       setLoading(true);
-      authFetch('http://localhost:5000/api/appointments/my')
+      authFetch(`${API_BASE_URL}/api/appointments/my`)
         .then(res => res.json())
         .then(data => {
           setAppointments(Array.isArray(data) ? data : []);
@@ -168,12 +169,12 @@ export default function AppointmentsSidebar({ isOpen, onClose }) {
                           </div>
                         )}
                         <div className="flex items-center gap-2">
-                          <Clock size={15} className="text-slate-400 shrink-0" />
-                          <span className="font-medium">{appt.slot}</span>
+                          <Calendar size={15} className="text-slate-400 shrink-0" />
+                          <span className="font-medium">{appt.date || formatDate(appt.createdAt)}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Calendar size={15} className="text-slate-400 shrink-0" />
-                          <span className="font-medium">{formatDate(appt.createdAt)}</span>
+                          <Clock size={15} className="text-slate-400 shrink-0" />
+                          <span className="font-medium">{appt.slot}</span>
                         </div>
                       </div>
 

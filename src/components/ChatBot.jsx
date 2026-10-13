@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, User, Bot, Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api';
 
 export default function ChatBot() {
   const { user } = useAuth();
@@ -30,7 +31,7 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,7 +46,7 @@ export default function ChatBot() {
       } else if (data.error) {
         setMessages(prev => [...prev, { role: 'model', text: `Error: ${data.error}`, isError: true }]);
       } else {
-        setMessages(prev => [...prev, { role: 'model', text: data.reply }]);
+        setMessages(prev => [...prev, { role: 'model', text: data.reply, source: data.source }]);
       }
     } catch (error) {
       setMessages(prev => [...prev, { role: 'model', text: 'Sorry, I am having trouble connecting to the server. Please check if the backend is running.', isError: true }]);
@@ -98,7 +99,12 @@ export default function ChatBot() {
                         ? 'bg-red-50 text-red-700 border border-red-100 rounded-tl-none'
                         : 'bg-white text-slate-700 border border-slate-200 rounded-tl-none'
                   }`}>
-                    {m.text}
+                    <p>{m.text}</p>
+                    {m.source === 'fallback' && (
+                      <p className="mt-2 pt-2 border-t border-slate-100 text-[11px] text-amber-600 font-medium">
+                        AI is temporarily unavailable. Showing a basic suggestion.
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

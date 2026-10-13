@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, MapPin, UploadCloud, CheckCircle2, FileText, X, Pill, ShieldCheck, Clock, Truck } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api';
 
 export default function PharmacyDetails() {
   const { pharmacyId } = useParams();
   const navigate = useNavigate();
+  const { authFetch } = useAuth();
   
   const [pharmacy, setPharmacy] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +20,7 @@ export default function PharmacyDetails() {
   const [notes, setNotes] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/pharmacies')
+    fetch(`${API_BASE_URL}/api/pharmacies`)
       .then(res => res.json())
       .then(data => {
         const found = data.find(p => p.originalId === pharmacyId);
@@ -65,9 +68,8 @@ export default function PharmacyDetails() {
     if (file) {
       setIsSubmitting(true);
       try {
-        await fetch('http://localhost:5000/api/medicine-orders', {
+        await authFetch(`${API_BASE_URL}/api/medicine-orders`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             pharmacyId: pharmacy.originalId,
             deliveryAddress,

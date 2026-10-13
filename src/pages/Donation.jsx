@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeartHandshake, ArrowLeft, CheckCircle2, ShieldCheck, Heart, User, Droplet, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api';
 
 export default function Donation() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function Donation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/donation-orgs')
+    fetch(`${API_BASE_URL}/api/donation-orgs`)
       .then(res => res.json())
       .then(data => {
         setDonationOrgs(data);
@@ -41,7 +42,7 @@ export default function Donation() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await authFetch('http://localhost:5000/api/organ-pledges', {
+      await authFetch(`${API_BASE_URL}/api/organ-pledges`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

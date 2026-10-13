@@ -1,5 +1,11 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'healthpath_super_secret_key_2024';
+
+// If JWT_SECRET is not set, log fatal error and exit immediately
+if (!process.env.JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET environment variable is not set. Exiting.');
+  process.exit(1);
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;

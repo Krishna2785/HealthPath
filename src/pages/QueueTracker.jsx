@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, User, Clock, Activity, MapPin, ArrowLeft } from 'lucide-react';
-import { doctors as mockDoctors } from '../data/mockData';
+// Note: no backend endpoint exists for real-time queue position.
+// A live queue API would need WebSocket support or polling — left as future work.
 
 export default function QueueTracker() {
   const { bookingId } = useParams();
@@ -26,7 +27,9 @@ export default function QueueTracker() {
     return () => clearInterval(interval);
   }, []);
 
-  const doctor = mockDoctors.find(d => d.id === doctorId) || { name: 'Your Doctor', speciality: 'Specialist' };
+  // doctorId could be used to fetch doctor info from the API in a future enhancement.
+  // For now we show a generic label since no GET /api/doctors/:id endpoint exists.
+  const doctor = { name: 'Your Doctor', speciality: 'Specialist' };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">

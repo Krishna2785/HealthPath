@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Clock, MapPin, Plus, Check, Search, Calendar, Home, Building2, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api';
 
 export default function LabDetails() {
   const { labId } = useParams();
   const navigate = useNavigate();
+  const { authFetch } = useAuth();
   
   const [lab, setLab] = useState(null);
   const [labTests, setLabTests] = useState([]);
@@ -17,8 +20,8 @@ export default function LabDetails() {
 
   useEffect(() => {
     Promise.all([
-      fetch('http://localhost:5000/api/labs').then(res => res.json()),
-      fetch('http://localhost:5000/api/lab-tests').then(res => res.json())
+      fetch(`${API_BASE_URL}/api/labs`).then(res => res.json()),
+      fetch(`${API_BASE_URL}/api/lab-tests`).then(res => res.json())
     ]).then(([labsData, testsData]) => {
       const foundLab = labsData.find(l => l.originalId === labId);
       setLab(foundLab);
@@ -51,14 +54,13 @@ export default function LabDetails() {
   const handleBook = async () => {
     setIsBooking(true);
     try {
-      const response = await fetch('http://localhost:5000/api/test-bookings', {
+      const response = await authFetch(`${API_BASE_URL}/api/test-bookings`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           labId: lab.originalId,
           tests: cart.map(t => t.originalId),
-          visitType,
-          totalAmount: cartTotal
+          visitType
+          // Note: totalAmount is NOT sent — server recalculates it from DB prices
         })
       });
       const result = await response.json();

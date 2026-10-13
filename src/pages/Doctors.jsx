@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Clock, Calendar, CheckCircle2, Search, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../api';
 
 export default function Doctors() {
   const { hospitalId, specialityName } = useParams();
@@ -12,13 +13,15 @@ export default function Doctors() {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const [bookingDate, setBookingDate] = useState(todayStr);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [bookingSlot, setBookingSlot] = useState(null);
   const [isBooking, setIsBooking] = useState(false);
 
   useEffect(() => {
     // Fetch Hospital
-    fetch('http://localhost:5000/api/hospitals')
+    fetch(`${API_BASE_URL}/api/hospitals`)
       .then(res => res.json())
       .then(data => {
         const found = data.find(h => h.originalId === hospitalId);
@@ -27,7 +30,7 @@ export default function Doctors() {
       .catch(err => console.error(err));
 
     // Fetch Doctors
-    fetch(`http://localhost:5000/api/doctors?hospitalId=${hospitalId}&speciality=${specialityName}`)
+    fetch(`${API_BASE_URL}/api/doctors?hospitalId=${hospitalId}&speciality=${specialityName}`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -81,10 +84,11 @@ export default function Doctors() {
   const handleBook = async () => {
     setIsBooking(true);
     try {
-      const response = await authFetch('http://localhost:5000/api/appointments', {
+      const response = await authFetch(`${API_BASE_URL}/api/appointments`, {
         method: 'POST',
         body: JSON.stringify({
           doctorId: selectedDoctor.originalId,
+          date: bookingDate,
           slot: bookingSlot,
           doctorName: selectedDoctor.name,
           speciality: selectedDoctor.speciality,
@@ -168,10 +172,21 @@ export default function Doctors() {
               </div>
             </div>
 
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-slate-700 mb-2">Appointment Date</label>
+              <input
+                type="date"
+                min={todayStr}
+                value={bookingDate}
+                onChange={(e) => setBookingDate(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-bold text-slate-700">Available Slots</h4>
-                <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md">Today</span>
+                <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-md">{bookingDate === todayStr ? 'Today' : bookingDate}</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {selectedDoctor.timeSlots.map(slot => (
@@ -188,9 +203,9 @@ export default function Doctors() {
 
             <div className="mt-auto pt-6 border-t border-slate-100">
               <button
-                disabled={!bookingSlot || isBooking}
+                disabled={!bookingSlot || !bookingDate || isBooking}
                 onClick={handleBook}
-                className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${bookingSlot && !isBooking ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 active:scale-95' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2 ${bookingSlot && bookingDate && !isBooking ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 active:scale-95' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
               >
                 {isBooking ? (
                   <>

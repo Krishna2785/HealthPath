@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const medicineOrderSchema = new mongoose.Schema({
   orderId: String,
+  userId: { type: String, required: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   pharmacyId: String,
   deliveryAddress: String,
   notes: String,

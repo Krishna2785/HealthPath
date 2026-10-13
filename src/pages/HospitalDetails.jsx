@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, MapPin, Clock, Search, Heart, Stethoscope, Bone, Baby, User, Activity, Brain, Siren } from 'lucide-react';
 import { specialitiesIcons } from '../data/mockData';
+import API_BASE_URL from '../api';
 
 const iconMap = {
   Heart, Stethoscope, Bone, Baby, User, Activity, Brain, Siren
@@ -16,7 +17,7 @@ export default function HospitalDetails() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/hospitals')
+    fetch(`${API_BASE_URL}/api/hospitals`)
       .then(res => res.json())
       .then(data => {
         const found = data.find(h => h.originalId === hospitalId);
