@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Star, Filter, Search, ArrowLeft, Pill, Clock, Truck } from 'lucide-react';
+import API_BASE_URL from '../api';
 
 export default function Pharmacies() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -8,7 +9,7 @@ export default function Pharmacies() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/pharmacies')
+    fetch(`${API_BASE_URL}/api/pharmacies`)
       .then(res => res.json())
       .then(data => {
         setPharmacies(data);
